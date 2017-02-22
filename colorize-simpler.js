@@ -15,18 +15,25 @@ function colorize(imageId, src, hex, next) {
 	
 	// Turn the Hex value supplied by our intrepid developer into an RGB value
 	
-	var c = hex.replace('#','');
-	var	r = parseInt(c.substring(0,2), 16);
-	var	g = parseInt(c.substring(2,4), 16);
-	var	b = parseInt(c.substring(4,6), 16);
-	var targetRGB = [+r, +g, +b];
-	
 	var base_image = new Image();							// load the image
 	base_image.src = src;
 
 	
 	base_image.onload = function() {						// when the image is loaded...
-	
+
+		var image = document.getElementById(imageId.replace('#',''));	
+
+		// if no color was provided, just load the image
+		if(hex === null) {
+			image.src = base_image.src;
+			return next();
+		}
+
+		var c = hex.replace('#','');
+		var	r = parseInt(c.substring(0,2), 16);
+		var	g = parseInt(c.substring(2,4), 16);
+		var	b = parseInt(c.substring(4,6), 16);
+		var targetRGB = [+r, +g, +b];	
 		// Create an invisible canvas element to do our wicked work
 		
 		var canvas = document.createElement('canvas'); 
@@ -66,7 +73,6 @@ function colorize(imageId, src, hex, next) {
 		
 		var url = canvas.toDataURL(); 						//turns the canvas into a data url
 		
-		var image = document.getElementById(imageId.replace('#',''));	
 		image.src = url; 									//and puts it back into the original html img
 		
 		// console.log('done');

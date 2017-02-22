@@ -114,7 +114,11 @@ var draw = function() {
 	}
 
 	function drawBeard() {
-		colorize('beard', "parts/" + character.body + "/beard" + character.beard + ".png", character.hairColor, moveCharacterGraphic);
+		colorize('beard', "parts/" + character.body + "/beard" + character.beard + ".png", character.hairColor, drawToy);
+	}
+
+	function drawToy() {
+		colorize('toy', "parts/" + character.body + "/toy" + character.toy + ".png", null, moveCharacterGraphic);
 	}
 
 	function moveCharacterGraphic() {
