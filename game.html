@@ -91,30 +91,43 @@ var max = {body:1,hair:21,pants:10,shirt:9,boots:5,toy:4,beard:10} //the availab
 /* draw the character */
 
 var draw = function() {
-
-	document.getElementById('body').src = "parts/" + character.body + "/body0.png";
-	document.getElementById('pants').src = "parts/" + character.body + "/pants" + character.pants + ".png";
-	document.getElementById('boots').src = "parts/" + character.body + "/boots" + character.boots + ".png";
-	document.getElementById('shirt').src = "parts/" + character.body + "/shirt" + character.shirt + ".png";
-	document.getElementById('hair').src = "parts/" + character.body + "/hair" + character.hair + ".png";
-	document.getElementById('beard').src = "parts/" + character.body + "/beard" + character.beard + ".png";
-	document.getElementById('toy').src = "parts/" + character.body + "/toy" + character.toy + ".png";
-
 	/* colorize the image data */
+
+	function drawBody() {
+		colorize("body", "parts/" + character.body + "/body0.png", character.skinColor, drawPants);
+	}
+
+	function drawPants() {
+		colorize('pants', "parts/" + character.body + "/pants" + character.pants + ".png", character.pantsColor, drawBoots);
+	}
+
+	function drawBoots() {
+		colorize('boots', "parts/" + character.body + "/boots" + character.boots + ".png", character.shirtColor, drawShirt);
+	}
 	
-	colorize("body",character.skinColor);
-	setTimeout(function() {colorize('pants',character.pantsColor); }, 25); //timeouts to avoid async problems 
-	setTimeout(function() {colorize('boots',character.shirtColor); }, 50); //possibly the dumbest way to avoid async problems
-	setTimeout(function() {colorize('shirt',character.shirtColor); }, 100); //no chance whatsoever of working on the internet?
-	setTimeout(function() {colorize('hair',character.hairColor); }, 125); 
-	setTimeout(function() {colorize('beard',character.hairColor); }, 150);
-	
-	setTimeout(function() { // copy it to the main screen's character sprite div too
+	function drawShirt() {
+		colorize('shirt', "parts/" + character.body + "/shirt" + character.shirt + ".png", character.shirtColor, drawHair);
+	}
+
+	function drawHair() {
+		colorize('hair', "parts/" + character.body + "/hair" + character.hair + ".png", character.hairColor, drawBeard);
+	}
+
+	function drawBeard() {
+		colorize('beard', "parts/" + character.body + "/beard" + character.beard + ".png", character.hairColor, drawToy);
+	}
+
+	function drawToy() {
+		colorize('toy', "parts/" + character.body + "/toy" + character.toy + ".png", null, moveCharacterGraphic);
+	}
+
+	function moveCharacterGraphic() {
+		// copy it to the main screen's character sprite div too
 		var moveTheCharacterGraphic = document.getElementById('composite').innerHTML;
 		document.getElementById('sprite').innerHTML=moveTheCharacterGraphic;
-		}, 200);
-	
-					
+	}
+
+	drawBody();
 }
 
 

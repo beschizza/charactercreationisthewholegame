@@ -1,7 +1,7 @@
 
-function colorize(image,hex) {
-	 
-	 console.log("colorizing #" + image + " with " + hex);
+function colorize(imageId, src, hex, next) {
+
+	console.log("colorizing #" + imageId + " with " + hex);
 	 
 	/* Colorizes an image while respecting luminance 
 	
@@ -9,38 +9,48 @@ function colorize(image,hex) {
 	
 			colorize("img element ID","hex color you want"); 	*/
 	
-	image = image.replace('#','');
-	image = document.getElementById(image); 			// get the target's id 
+	// var image = document.getElementById(imageId.replace('#','')); 			// get the target's id 
 	
-	console.log("colorizing #" + image + " with " + hex);
+	// console.log("colorizing #" + image + " with " + hex);
 	
 	// Turn the Hex value supplied by our intrepid developer into an RGB value
 	
-	hex = hex.replace('#','');
-	var	r = parseInt(hex.substring(0,2), 16);
-	var	g = parseInt(hex.substring(2,4), 16);
-	var	b = parseInt(hex.substring(4,6), 16);
-	var targetRGB = [+r, +g, +b];
-	
-	base_image = new Image();							// load the image
-	base_image.src = image.src;
+	var base_image = new Image();							// load the image
+	base_image.src = src;
 
 	
 	base_image.onload = function() {						// when the image is loaded...
-	
+
+		var image = document.getElementById(imageId.replace('#',''));	
+
+		// if no color was provided, just load the image
+		if(hex === null) {
+			image.src = base_image.src;
+			return next();
+		}
+
+		var c = hex.replace('#','');
+		var	r = parseInt(c.substring(0,2), 16);
+		var	g = parseInt(c.substring(2,4), 16);
+		var	b = parseInt(c.substring(4,6), 16);
+		var targetRGB = [+r, +g, +b];	
 		// Create an invisible canvas element to do our wicked work
 		
 		var canvas = document.createElement('canvas'); 
-		canvas.id     = "colorizeThe"+image.id;
+		canvas.id     = "colorizeThe"+imageId;
 		canvas.width  = base_image.width; 
 		canvas.height = base_image.height;
-		context = canvas.getContext('2d');
+		var context = canvas.getContext('2d');
 		//document.body.appendChild(canvas); 				//uncomment to render the otherwise-invisible canvas
 			
 		context.drawImage(base_image, 0, 0);				//draw the image in our temporary canvas
 
 		// read the image data from the canvas into a variable. Sadly can't be done directly from the Image() constructor */
 		
+		// if(canvas.width == 0 && canvas.height == 0) {
+		// 	return resolve();
+		// }
+
 		var imgData=context.getImageData(0,0,canvas.width,canvas.height);
 
 		// for each pixel...
@@ -65,5 +75,7 @@ function colorize(image,hex) {
 		
 		image.src = url; 									//and puts it back into the original html img
 		
+		// console.log('done');
+		next();
   }
 }
