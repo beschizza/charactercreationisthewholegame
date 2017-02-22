@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 
 <style>@import url('style.css');</style>
-<script src="promise.min.js"></script>
 <script src="quest.js"></script> <!--quest generator, returns gold and xp too -->
 <script src="item.js"></script> <!--item generator -->
 <script src="careers.js"></script> <!--item generator -->
@@ -93,27 +92,38 @@ var max = {body:1,hair:21,pants:10,shirt:9,boots:5,toy:4,beard:10} //the availab
 
 var draw = function() {
 	/* colorize the image data */
+
+	function drawBody() {
+		colorize("body", "parts/" + character.body + "/body0.png", character.skinColor, drawPants);
+	}
+
+	function drawPants() {
+		colorize('pants', "parts/" + character.body + "/pants" + character.pants + ".png", character.pantsColor, drawBoots);
+	}
+
+	function drawBoots() {
+		colorize('boots', "parts/" + character.body + "/boots" + character.boots + ".png", character.shirtColor, drawShirt);
+	}
 	
-	colorize("body", "parts/" + character.body + "/body0.png", character.skinColor)
-		.then(function() {
-			colorize('pants', "parts/" + character.body + "/pants" + character.pants + ".png", character.pantsColor);
-		})
-		.then(function() {
-			colorize('boots', "parts/" + character.body + "/boots" + character.boots + ".png", character.shirtColor);
-		})
-		.then(function() {
-			colorize('shirt', "parts/" + character.body + "/shirt" + character.shirt + ".png", character.shirtColor);
-		})
-		.then(function() {
-			colorize('hair', "parts/" + character.body + "/hair" + character.hair + ".png", character.hairColor);
-		})
-		.then(function() {
-			colorize('beard', "parts/" + character.body + "/beard" + character.beard + ".png", character.hairColor);
-		})
-		.then(function() { // copy it to the main screen's character sprite div too
-			var moveTheCharacterGraphic = document.getElementById('composite').innerHTML;
-			document.getElementById('sprite').innerHTML=moveTheCharacterGraphic;
-		});	
+	function drawShirt() {
+		colorize('shirt', "parts/" + character.body + "/shirt" + character.shirt + ".png", character.shirtColor, drawHair);
+	}
+
+	function drawHair() {
+		colorize('hair', "parts/" + character.body + "/hair" + character.hair + ".png", character.hairColor, drawBeard);
+	}
+
+	function drawBeard() {
+		colorize('beard', "parts/" + character.body + "/beard" + character.beard + ".png", character.hairColor, moveCharacterGraphic);
+	}
+
+	function moveCharacterGraphic() {
+		// copy it to the main screen's character sprite div too
+		var moveTheCharacterGraphic = document.getElementById('composite').innerHTML;
+		document.getElementById('sprite').innerHTML=moveTheCharacterGraphic;
+	}
+
+	drawBody();
 }
 
 
