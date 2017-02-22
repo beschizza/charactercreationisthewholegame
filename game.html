@@ -1,0 +1,672 @@
+<html>
+<head>
+<title>Character Creation Is The Whole Game</title>
+<meta charset="utf-8">
+
+<style>@import url('style.css');</style>
+<script src="quest.js"></script> <!--quest generator, returns gold and xp too -->
+<script src="item.js"></script> <!--item generator -->
+<script src="careers.js"></script> <!--item generator -->
+<script src="queststories.js"></script> <!--random flavor text for certain jobs -->
+<script src="colorize-simpler.js"></script> <!-- colorize character parts -->
+<script src="stories.js"></script> <!-- all the stories -->
+
+<script>
+
+
+/* Function to fetch random entry from arrays */
+pick=function (x) {
+	//console.log('Random pick from: ' + x);
+	var r = [Math.floor ( Math.random() * x.length )]; 	//random item
+	var pick = x[r]; 
+	//x.splice(r, 1);	//remove the random item from the array so it won't be reused
+	return pick;
+}
+
+
+/* load sounds */
+var clicky = new Audio('sounds/1.wav');
+var scrollnoise = new Audio('sounds/scroll.mp3');
+var levelupnoise = new Audio('sounds/level.mp3');
+
+/* story counter */
+var counter=0;
+
+/* set up character object */
+var character = {
+	name: "Incognito",
+	job: "Kiddo",
+	STR: 9,
+	DEX: 9,
+	INT: 9,
+	WIS: 9,
+	CHA: 9,
+	favecolor:1,
+	points:7,
+	level:1,
+	exp:8,
+	gold:1,
+	age:14,
+	inventory: ['the remains of your childhood hamster'],
+	body:0,skinColor:"997755",
+	hair:Math.ceil(Math.random(1)*7),beard:Math.ceil(Math.random(1)*7),hairColor:"997755",
+	pants:Math.ceil(Math.random(1)*3),pantsColor:"777777",
+	shirt:Math.ceil(Math.random(1)*7),shirtColor:"cccccc",
+	boots:1,
+	toy:Math.floor(Math.random(1)*5)
+}
+
+	var stats = []; //to be used to calculate highest stat
+	var highestStat = ""; //to be used to calculate highest stat
+	var traits = ['Healthy','Hopeful','Young']; //should be put in the character object
+	var elixir;
+	
+/* TITLE SCREEN FUNCTIONS */
+
+function showHints () { //Popup box of tips
+	var currentStatus = document.getElementById('hints').style.display;
+	if (currentStatus != "block") {
+		document.getElementById('hints').style.display = "block";
+		scrollnoise.play(); // play the click noise
+	}
+	else {
+		document.getElementById('hints').style.display = "none";
+		scrollnoise.play(); // play the click noise
+	}
+}
+
+function startGame () { // Start the game, move to the character color picker
+	document.getElementById('hints').style.display = "none";
+	document.getElementById('titleScreen').style.display = "none";
+	document.getElementById('designCharacter').style.display = "block";
+	clicky.play(); // play the click noise
+}
+
+
+/* FUNCTIONS FOR CHARACTER APPEARANCE SCREEN */
+
+var max = {body:1,hair:21,pants:10,shirt:9,boots:5,toy:4,beard:10} //the available number of options for each character part
+
+
+/* draw the character */
+
+var draw = function() {
+
+	document.getElementById('body').src = "parts/" + character.body + "/body0.png";
+	document.getElementById('pants').src = "parts/" + character.body + "/pants" + character.pants + ".png";
+	document.getElementById('boots').src = "parts/" + character.body + "/boots" + character.boots + ".png";
+	document.getElementById('shirt').src = "parts/" + character.body + "/shirt" + character.shirt + ".png";
+	document.getElementById('hair').src = "parts/" + character.body + "/hair" + character.hair + ".png";
+	document.getElementById('beard').src = "parts/" + character.body + "/beard" + character.beard + ".png";
+	document.getElementById('toy').src = "parts/" + character.body + "/toy" + character.toy + ".png";
+
+	/* colorize the image data */
+	
+	colorize("body",character.skinColor);
+	setTimeout(function() {colorize('pants',character.pantsColor); }, 25); //timeouts to avoid async problems 
+	setTimeout(function() {colorize('boots',character.shirtColor); }, 50); //possibly the dumbest way to avoid async problems
+	setTimeout(function() {colorize('shirt',character.shirtColor); }, 100); //no chance whatsoever of working on the internet?
+	setTimeout(function() {colorize('hair',character.hairColor); }, 125); 
+	setTimeout(function() {colorize('beard',character.hairColor); }, 150);
+	
+	setTimeout(function() { // copy it to the main screen's character sprite div too
+		var moveTheCharacterGraphic = document.getElementById('composite').innerHTML;
+		document.getElementById('sprite').innerHTML=moveTheCharacterGraphic;
+		}, 200);
+	
+					
+}
+
+
+/* Change a character component */
+
+var change = function(target,step) {
+
+		if (step==0){
+			character[target] = 0;
+		}
+		else{
+			character[target]+=step;
+		}
+		
+		if (character[target]>max[target]) {character[target] = 0;}
+		if (character[target]<0) {character[target] = max[target];}
+
+		if (target=="body") { character["beard"] =0 ;}
+		draw();	
+}
+
+
+drawCharacter = function() {
+	drawStatus();
+	console.log('drawing char');
+}
+
+charName = function(newname) {
+	console.log('setting name to ' + newname);
+	character.name = newname;
+	drawCharacter();
+}
+
+
+charSet = function(target,option) {
+	//alert("targeting " + target + " with option " + option);
+
+	if (target == "body") { //selecting body type
+		character.body = option;	
+		document.getElementById('charBody0').style.opacity=.5; // Highlight the selected body type
+		document.getElementById('charBody1').style.opacity=.5;
+		document.getElementById('charBody2').style.opacity=.5;
+		document.getElementById('charBody3').style.opacity=.5;
+		document.getElementById('charBody' + option).style.opacity=1;
+	}
+
+	clicky.play();
+	//character[target] ++;
+	drawCharacter();
+}
+
+picker = function(target,color) {
+	console.log(target + ' = ' + color);
+	clicky.play();
+	//character[target] = color;
+	drawCharacter();
+}
+
+
+function mainGame () { // move to the main game screen
+	document.getElementById('designCharacter').style.display = "none";
+	document.getElementById('main').style.display = "block";
+	
+	var moveTheCharacterGraphic = document.getElementById('composite').innerHTML;
+	document.getElementById('sprite').innerHTML=moveTheCharacterGraphic;
+
+	clicky.play(); 
+}
+
+
+/* FUNCTIONS FOR MAIN GAME SCREEN */
+
+function point(attribute,step) { // When player increases or decreases an attribute
+	clicky.play(); 	
+	character[attribute]+=step;
+	document.getElementById(attribute).innerHTML = character[attribute];
+	
+	if (step == 1) {
+		character.points--;
+	}
+	else {
+		character.points++;
+	}
+	
+	if (character.points == 1) {
+		document.getElementById("points").innerHTML = character.points + " point left";
+	}
+	else {
+		document.getElementById("points").innerHTML = character.points + " points left";
+	}
+	
+	levelup(character.exp);
+	
+	careers(); //check for career change before nextTurn. in careers.js
+}
+
+function nextTurn() {
+	
+	elixir = quest(character.level); //generate a quest
+		character.gold += elixir.gold; // apply results
+		character.exp += elixir.exp;
+	
+	newItem = getItem(character.level); // and some loot
+		character.inventory.push(newItem);
+		character.age++;
+	
+
+	stats = {	STR: character.STR,	DEX: character.DEX,	INT: character.INT,	WIS: character.WIS,	CHA: character.CHA} 	//Temporary array to make it easier to	
+	
+	highestStat = Object.keys(stats).reduce(function(a, b){ return stats[a] > stats[b] ? a : b }); 						//find the highest stat
+	
+	generateQuestStory(); // displays it to the text box
+
+	//hide or reveal the increase/decrease stat arrows
+	
+	if (character.points < 1 ) {
+	
+		document.getElementById("arrowSTRup").style.display = "none";
+		document.getElementById("arrowDEXup").style.display = "none";
+		document.getElementById("arrowINTup").style.display = "none";
+		document.getElementById("arrowWISup").style.display = "none";
+		document.getElementById("arrowCHAup").style.display = "none";
+		document.getElementById("retirementButton").style.display = "block";
+	}
+	else {
+		document.getElementById("arrowSTRup").style.display = "inline";
+		document.getElementById("arrowDEXup").style.display = "inline";
+		document.getElementById("arrowINTup").style.display = "inline";
+		document.getElementById("arrowWISup").style.display = "inline";
+		document.getElementById("arrowCHAup").style.display = "inline";
+	}
+
+	if (character.STR < 7 || character.STR > 11) {document.getElementById("arrowSTRdown").style.display = "none";}
+	if (character.DEX < 7 || character.DEX > 11) {document.getElementById("arrowDEXdown").style.display = "none";}
+	if (character.INT < 7 || character.INT > 11) {document.getElementById("arrowINTdown").style.display = "none";}
+	if (character.WIS < 7 || character.WIS > 11) {document.getElementById("arrowWISdown").style.display = "none";}
+	if (character.CHA < 7 || character.CHA > 11) {document.getElementById("arrowCHAdown").style.display = "none";}
+	
+	//age effects
+	if (character.age > 59) { document.getElementById("retirementButton").style.display = "block";}
+	
+	if (character.age > 65) { 	
+		openStory(storyRetirement);	
+	}
+	
+	if (character.age > 40 && Math.random() <0.2) {
+		character.hairColor='ffffff';draw();
+	}
+	
+	if (character.age > 40 && Math.random() <0.1 && character.body==0) {
+		character.hair=0;draw();
+	}
+	
+		drawStatus();
+}
+
+
+
+function updateStory(text) { // UPDATES THE STORY BOX TEXT 
+	var oldtext = document.getElementById('story').innerHTML;
+	var newtext = text ;
+	//var newtext = text + "<br><span class='oldtext'>" + oldtext + "</span>"; //This one appends the old text
+	document.getElementById('story').innerHTML = newtext;
+}
+
+function levelup(exp) { //CHECK FOR LEVEL UP
+	switch(true) {
+		case (exp > 4000):	character.level=10;	break;	
+		case (exp > 3000):	character.level=9;	break;
+		case (exp > 2000):	character.level=8;	break; 
+		case (exp > 1200):	character.level=7;	break;
+		case (exp > 800):	character.level=6;	break; 
+		case (exp > 400):	character.level=5;	break;
+		case (exp > 200):	character.level=4;	break; 
+		case (exp > 100):	character.level=3;	break;
+		case (exp > 50):	character.level=2;	break; 
+		default: character.level=1;	break;	
+	}
+}
+
+
+
+
+function drawStatus() { // redraws the stats and character after something changes
+	document.getElementById("status").innerHTML = character.name + ", level <span class='num'>" + character.level + " </span> " + character.job + ", Age <span class='num'>" + character.age + "</span>";
+	document.getElementById("STR").innerHTML= character.STR; 
+	document.getElementById("DEX").innerHTML= character.DEX; 
+	document.getElementById("INT").innerHTML= character.INT; 
+	document.getElementById("WIS").innerHTML= character.WIS; 
+	document.getElementById("CHA").innerHTML= character.CHA; 
+	document.getElementById("gold_count").innerHTML= character.gold + "g"; 
+	document.getElementById("exp_count").innerHTML= character.exp + "xp";
+	document.getElementById("item1").innerHTML= traits[0];
+	document.getElementById("item2").innerHTML= traits[1];
+	document.getElementById("item3").innerHTML= traits[2];
+	document.getElementById("points").innerHTML= "Points left: " + character.points;
+}
+
+
+
+
+function openStory(whichStory) { //popup dialog
+
+		
+		counter++; whichStory.played++;
+		character.points++; //bonus point
+		
+		drawStatus();
+		
+		var newStory = document.createElement("div");
+		newStory.setAttribute('class', 'storyBox');
+		newStory.setAttribute('id', 'popup' + counter);
+		
+		if (whichStory.picture) {
+			newStory.innerHTML = '<img class="storyPic" src="' + whichStory.picture +'">';
+		}
+		
+		newStory.innerHTML += "<span class='storyTitle'>" + whichStory.title + "</span><br>" + whichStory.text;
+		newStory.innerHTML += '<div class="storyButtons">';
+		
+		if (whichStory.YES) { //If a story's YES is defined, then there will be YES or NO. YES has results, NO does nothing.
+			newStory.innerHTML += "<img id=\"yesClick\" class=\"nextButton\" src=\"images/yes.png\" onClick=\"" + whichStory.YES + ";closeStory('popup" + counter+ "')\">\n";
+			newStory.innerHTML += "<img id=\"noClick\" class=\"nextButton\" src=\"images/no.png\" onClick=\"closeStory('popup" + counter+ "')\">";
+		}
+		else
+		{
+			newStory.innerHTML += "<img id=\"yesClick\" class=\"nextButton\" src=\"images/ok.png\" onClick=\"" + whichStory.OK + ";closeStory('popup" + counter+ "')\">";
+		}
+		newStory.innerHTML += '</div>';
+		document.getElementById('main').appendChild(newStory);
+		
+		//create listeners for keyboard options
+	
+		document.onkeydown = function(e) {
+
+			e = e || window.event;
+			var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
+
+			if (charCode == 37 || charCode == 89  || charCode == 13) { // YES/OK: left arrow, y or enter/return
+				document.getElementById("yesClick").click();
+			}
+			 if (charCode == 39  || charCode == 78 || charCode == 16) {// NO: right arrow, y or shift
+				document.getElementById("noClick").click();
+			}
+
+			
+		}
+		
+		
+}
+
+function closeStory(id) { // close story 
+	//document.getElementById(id).style.display = "none"; 
+	var element = document.getElementById(id);
+	element.parentNode.removeChild(element);
+	drawStatus();
+	clicky.play(); // play the click noise	
+	nextTurn();
+}
+
+
+function retirement(message) {
+	document.getElementById('main').style.display = "none";
+	document.getElementById('retirement').style.display = "block";
+	clicky.play(); // play the click noise
+	
+	
+	if (character.age < 30 || character.gold < 45) { message = "Mediocrity and Poverty"; }
+
+	
+	var inventoryText = character.inventory[0];	
+	for (i = 1; i < character.inventory.length; i++) {
+
+			inventoryText += ", " + character.inventory[i];
+			
+		}
+		
+		document.getElementById('retirementMessage').innerHTML=message;
+		document.getElementById('retirementText').innerHTML="You've retired at " + character.age + " years old, with " + character.gold + " gold, " + character.exp + " experience points and the position of " + character.job + ". You found " + inventoryText;
+		
+		
+
+}
+
+
+
+</script>
+
+</head>
+
+<body>
+
+
+<div id="game">
+
+<!-- THE TITLE SCREEN -->
+
+<div id="titleScreen">
+	<img src="images/title_main.gif" style="width:100%;right:4px;top:4px;position:absolute;">
+	
+	
+	<div id="titleScreen_buttons" style="bottom:20px;position:absolute;width:100%;text-align:center">
+	By Rob Beschizza
+	<p><br>
+		<img src="images/title_hints.png" onClick="showHints();" style="width:20%;margin-right:60px;">
+		<img src="images/title_start.png" onClick="startGame();" style="width:20%;">
+	</div>	
+	
+</div>
+
+<!-- HINTS POPUP -->
+
+<div id="hints" onClick="showHints();">
+	- Spend points to increase attributes
+	<br>
+	- Have a plan in life. 
+	<br>
+	- Focus on stats to earn career bonuses, but seek balance
+	<br>
+	- There are unique paths through life.
+	<br>
+	- Sometimes merit alone is not enough.
+</div>
+
+
+<div id="enterName">
+
+
+</div>
+
+
+<!-- CHARACTER DESIGN SCREEN -->
+
+
+<div id="designCharacter">
+
+	<div id="charName">Name: <input id="charNameInput" value="incognito" onClick="this.select();" onBlur="charName(this.value);" type="text" autofocus></div>
+
+	<div id="charRand" onClick="">Body Type</div>
+
+	<div id="charPreview">
+		<!--	<img src="images/sprite.png" style="width:160px;"> -->
+			<div id="composite">
+
+				<img class="part" id="body" src="parts/0/body0.png">
+				<img class="part" id="boots">
+				<img class="part" id="pants">
+				<img class="part" id="shirt">
+				<img class="part" id="hair">
+				<img class="part" id="beard">
+				<img class="part" id="toy">
+
+			</div>
+	</div>
+
+	<div id="charControls">
+		<span id="charHair">	<img class="arrows" src="images/down.png" onClick="change('hair',-1);"> <img class="arrows" src="images/up.png"  onClick="change('hair',1);"> Hair <img class="arrows" src="images/none.png"  onClick="change('hair',0);"></span><br>
+		<span id="charHair">	<img class="arrows" src="images/down.png" onClick="change('beard',-1);"> <img class="arrows" src="images/up.png"  onClick="change('beard',1);"> Beard <img class="arrows" src="images/none.png"  onClick="change('beard',0);"></span><br>
+		<span id="charShirt">	<img class="arrows" src="images/down.png" onClick="change('shirt',-1);"> <img class="arrows" src="images/up.png"  onClick="change('shirt',1);"> Shirt <img class="arrows" src="images/none.png"  onClick="change('shirt',0);"></span><br>
+		<span id="charPants">	<img class="arrows" src="images/down.png" onClick="change('pants',-1);"> <img class="arrows" src="images/up.png"  onClick="change('pants',1);"> Pants <img class="arrows" src="images/none.png"  onClick="change('pants',0);"></span><br>
+		<span id="charBoots">	<img class="arrows" src="images/down.png" onClick="change('boots',-1);"> <img class="arrows" src="images/up.png"  onClick="change('boots',1);"> Boots <img class="arrows" src="images/none.png"  onClick="change('boots',0);"></span><br>
+	</div>
+
+	<div id="charBody">
+		<img class="charBodyImage" id="charBody0" onClick="change('body',1)" src="parts/body0.png">
+		<img class="charBodyImage" id="charBody1" onClick="change('body',1)" src="parts/body2.png">
+	</div>
+
+<div id="charColors">
+	<div id="">Skin tone
+		<span class="pickerBar">
+			<button class="colorPick" style="background-color:#fbf2f2" id="" onClick="character.skinColor='fbf2f2';draw();" src="">
+			<button class="colorPick" style="background-color:#facfcd" id="" onClick="character.skinColor='facfcd';draw();" src="">
+			<button class="colorPick" style="background-color:#f2ceba" id="" onClick="character.skinColor='f2ceba';draw();" src="">
+			<button class="colorPick" style="background-color:#f0c898" id="" onClick="character.skinColor='f0c898';draw();" src="">
+			<button class="colorPick" style="background-color:#e2c88f" id="" onClick="character.skinColor='e2c88f';draw();" src="">
+			<button class="colorPick" style="background-color:#d2ac78" id="" onClick="character.skinColor='d2ac78';draw();" src="">
+			<button class="colorPick" style="background-color:#d39667" id="" onClick="character.skinColor='d39667';draw();" src="">
+			<button class="colorPick" style="background-color:#ac7249" id="" onClick="character.skinColor='ac7249';draw();" src="">
+			<button class="colorPick" style="background-color:#935f4f" id="" onClick="character.skinColor='935f4f';draw();" src="">
+			<button class="colorPick" style="background-color:#663d1b" id="" onClick="character.skinColor='663d1b';draw();" src="">
+			<button class="colorPick" style="background-color:#411f02" id="" onClick="character.skinColor='411f02';draw();" src="">
+			<button class="colorPick" style="background-color:#29180b" id="" onClick="character.skinColor='29180b';draw();" src="">
+			<button class="colorPick" style="background-color:#19130d" id="" onClick="character.skinColor='19130d';draw();" src="">
+			<button class="colorPick" style="background-color:#bb3c3c" id="" onClick="character.skinColor='bb3c3c';draw();" src="">
+			<button class="colorPick" style="background-color:#6783b2" id="" onClick="character.skinColor='6783b2';draw();" src="">
+			<button class="colorPick" style="background-color:#58782b" id="" onClick="character.skinColor='58782b';draw();" src="">
+			<button class="colorPick" style="background-color:#714480" id="" onClick="character.skinColor='714480';draw();" src="">
+		</span>
+	</div>
+
+	<div id="">Hair tint
+		<span class="pickerBar">
+			<button class="colorPick" style="background-color:#f8f4f4" id="" onClick="character.hairColor='f8f4f4';draw();" src="">
+			<button class="colorPick" style="background-color:#ded4be" id="" onClick="character.hairColor='ded4be';draw();" src="">
+			<button class="colorPick" style="background-color:#ceb985" id="" onClick="character.hairColor='ceb985';draw();" src="">
+			<button class="colorPick" style="background-color:#aa9472" id="" onClick="character.hairColor='aa9472';draw();" src="">
+			<button class="colorPick" style="background-color:#f0cd78" id="" onClick="character.hairColor='f0cd78';draw();" src="">
+			<button class="colorPick" style="background-color:#d4a24b" id="" onClick="character.hairColor='d4a24b';draw();" src="">
+			<button class="colorPick" style="background-color:#ca6d11" id="" onClick="character.hairColor='ca6d11';draw();" src="">
+			<button class="colorPick" style="background-color:#92481c" id="" onClick="character.hairColor='92481c';draw();" src="">
+			<button class="colorPick" style="background-color:#712905" id="" onClick="character.hairColor='712905';draw();" src="">
+			<button class="colorPick" style="background-color:#432618" id="" onClick="character.hairColor='432618';draw();" src="">
+			<button class="colorPick" style="background-color:#2a2522" id="" onClick="character.hairColor='2a2522';draw();" src="">
+			<button class="colorPick" style="background-color:#19130d" id="" onClick="character.hairColor='19130d';draw();" src="">
+			<button class="colorPick" style="background-color:#666666" id="" onClick="character.hairColor='666666';draw();" src="">
+			<button class="colorPick" style="background-color:#b0b0b0" id="" onClick="character.hairColor='b0b0b0';draw();" src="">
+			<button class="colorPick" style="background-color:#c73030" id="" onClick="character.hairColor='c73030';draw();" src="">
+			<button class="colorPick" style="background-color:#2d5bdf" id="" onClick="character.hairColor='2d5bdf';draw();" src="">
+			<button class="colorPick" style="background-color:#26af30" id="" onClick="character.hairColor='26af30';draw();" src="">
+		</span>
+	</div>
+
+	<div id="charColor">Fave color
+		<span class="pickerBar">
+			<button class="colorPick" style="background-color:#FF0000" id="" onClick="character.shirtColor='FF0000';draw();" src="">
+			<button class="colorPick" style="background-color:#ffc500" id="" onClick="character.shirtColor='ffc500';draw();" src="">
+			<button class="colorPick" style="background-color:#f2fc02" id="" onClick="character.shirtColor='f2fc02';draw();" src="">
+			<button class="colorPick" style="background-color:#96ed0d" id="" onClick="character.shirtColor='96ed0d';draw();" src="">
+			<button class="colorPick" style="background-color:#00c0f7" id="" onClick="character.shirtColor='00c0f7';draw();" src="">
+			<button class="colorPick" style="background-color:#4469ff" id="" onClick="character.shirtColor='4469ff';draw();" src="">
+			<button class="colorPick" style="background-color:#840bc2" id="" onClick="character.shirtColor='840bc2';draw();" src="">
+			<button class="colorPick" style="background-color:#d436a2" id="" onClick="character.shirtColor='d436a2';draw();" src="">
+			<button class="colorPick" style="background-color:#6f0909" id="" onClick="character.shirtColor='6f0909';draw();" src="">
+			<button class="colorPick" style="background-color:#354806" id="" onClick="character.shirtColor='354806';draw();" src="">
+			<button class="colorPick" style="background-color:#ab4f49" id="" onClick="character.shirtColor='ab4f49';draw();" src="">
+			<button class="colorPick" style="background-color:#446395" id="" onClick="character.shirtColor='446395';draw();" src="">
+			<button class="colorPick" style="background-color:#4e055b" id="" onClick="character.shirtColor='4e055b';draw();" src="">
+			<button class="colorPick" style="background-color:#00007f" id="" onClick="character.shirtColor='00007f';draw();" src="">
+			<button class="colorPick" style="background-color:#000000" id="" onClick="character.shirtColor='000000';draw();" src="">
+			<button class="colorPick" style="background-color:#6f6f6f" id="" onClick="character.shirtColor='6f6f6f';draw();" src="">
+			<button class="colorPick" style="background-color:#FFFFFF" id="" onClick="character.shirtColor='FFFFFF';draw();" src="">
+		</span>
+	</div>
+	
+	
+	<div id="charColor">Accent color
+		<span class="pickerBar">
+			<button class="colorPick" style="background-color:#9a0000" id="" onClick="character.pantsColor='9a0000';draw();" src="">
+			<button class="colorPick" style="background-color:#9a8900" id="" onClick="character.pantsColor='9a8900';draw();" src="">
+			<button class="colorPick" style="background-color:#9abc02" id="" onClick="character.pantsColor='9abc02';draw();" src="">
+			<button class="colorPick" style="background-color:#679d0d" id="" onClick="character.pantsColor='679d0d';draw();" src="">
+			<button class="colorPick" style="background-color:#008097" id="" onClick="character.pantsColor='008097';draw();" src="">
+			<button class="colorPick" style="background-color:#23399f" id="" onClick="character.pantsColor='23399f';draw();" src="">
+			<button class="colorPick" style="background-color:#560b72" id="" onClick="character.pantsColor='560b72';draw();" src="">
+			<button class="colorPick" style="background-color:#ab1672" id="" onClick="character.pantsColor='ab1672';draw();" src="">
+			<button class="colorPick" style="background-color:#340909" id="" onClick="character.pantsColor='340909';draw();" src="">
+			<button class="colorPick" style="background-color:#122806" id="" onClick="character.pantsColor='122806';draw();" src="">
+			<button class="colorPick" style="background-color:#672f29" id="" onClick="character.pantsColor='672f29';draw();" src="">
+			<button class="colorPick" style="background-color:#233355" id="" onClick="character.pantsColor='233355';draw();" src="">
+			<button class="colorPick" style="background-color:#12052b" id="" onClick="character.pantsColor='12052b';draw();" src="">
+			<button class="colorPick" style="background-color:#00003f" id="" onClick="character.pantsColor='00003f';draw();" src="">
+			<button class="colorPick" style="background-color:#000000" id="" onClick="character.pantsColor='000000';draw();" src="">
+			<button class="colorPick" style="background-color:#343f3f" id="" onClick="character.pantsColor='343f3f';draw();" src="">
+			<button class="colorPick" style="background-color:#aaaaaa" id="" onClick="character.pantsColor='aaaaaa';draw();" src="">
+		</span>
+	</div>
+	
+
+	<div id="charToy">
+		<span style="position:relative;top:-15px">Best toy</span>
+		<img class="charToyPick" src="parts/toySTR.png" onClick="change('toy',1)" style="margin-left:80px;">
+		<img class="charToyPick" src="parts/toyDEX.png" onClick="change('toy',1)">
+		<img class="charToyPick" src="parts/toyINT.png" onClick="change('toy',1)">
+		<img class="charToyPick" src="parts/toyWIS.png" onClick="change('toy',1)">
+		<img class="charToyPick" src="parts/toyCHA.png" onClick="change('toy',1)">
+		<img class="nextButton" src="images/button_next.png" onClick="mainGame();" style="position:absolute;right:20px;">
+
+	</div>
+</div>
+
+
+
+</div>
+
+
+<!-- MAIN GAME SCREEN -->
+<div id="main">
+	<div id="status">Name and status here</div>
+		<div id="sprite">
+			<!--<img id="spriteimg" src="images/sprite.png">-->			
+		</div>
+		
+
+	<div id="stats">
+		<div class="stat">
+			<span class="arrowWidth"><img class="arrows" src="images/down.png" id="arrowSTRdown" onClick="point('STR',-1);"></span>
+				<span id="STR" class="num">0</span>
+					<span class="statWidth">STR</span>
+						<img class="arrows" src="images/up.png" id="arrowSTRup" onClick="point('STR',1);">
+		</div>
+		
+		<div class="stat">
+			<span class="arrowWidth"><img class="arrows" src="images/down.png" id="arrowDEXdown" onClick="point('DEX',-1);"></span>
+				<span id="DEX" class="num">0</span>
+					<span class="statWidth">DEX</span>
+						<img class="arrows" src="images/up.png" id="arrowDEXup" onClick="point('DEX',1);"></div>
+		
+		<div class="stat">
+			<span class="arrowWidth"><img class="arrows" src="images/down.png" id="arrowINTdown" onClick="point('INT',-1);"></span>
+				<span id="INT" class="num">0</span>
+					<span class="statWidth">INT</span>
+						<img class="arrows" src="images/up.png" id="arrowINTup" onClick="point('INT',1);"></div>
+		
+		<div class="stat">
+			<span class="arrowWidth"><img class="arrows" src="images/down.png" id="arrowWISdown" onClick="point('WIS',-1);"></span>
+				<span id="WIS" class="num">0</span>
+					<span class="statWidth">WIS</span>
+						<img class="arrows" src="images/up.png" id="arrowWISup" onClick="point('WIS',1);"></div>
+		
+		<div class="stat">
+			<span class="arrowWidth"><img class="arrows" src="images/down.png" id="arrowCHAdown" onClick="point('CHA',-1);"></span>
+				<span id="CHA" class="num">0</span>
+					<span class="statWidth">CHA</span>
+						<img class="arrows" src="images/up.png" id="arrowCHAup" onClick="point('CHA',1);"></div>
+	</div>
+	
+
+	
+	<div id="list">
+		<div class="item" id="points">7 points left</div> 
+		<div class="item" id="gold">Gold: <span id="gold_count">000</span> XP: <span id="exp_count"></span></div> 
+		<div class="itemAttribute" id="item1">- item;</div> 
+		<div class="itemAttribute" id="item2">- item;</div> 
+		<div class="itemAttribute" id="item3">- item;</div> 
+	</div>
+	
+	<div id="story">
+		On the threshold of adulthood you take stock of your life's potential. Modify your attributes, young hero!
+	</div>
+	
+	<img id="retirementButton" src="images/retire.png" class="nextButton" onClick="retirement('The Golden Afternoon')" style="position:absolute;bottom:12px;right:12px;display:none;">
+
+</div>
+
+	<div id="retirement" style="display:none">
+		<div id="retirementMessage" style="text-align:center;color:gold"></div>
+		<div id="retirementText" style="margin-top:1em;"></div>
+
+	</div>
+
+</div>
+
+
+
+
+
+
+</body>
+
+<script>
+	draw();
+	drawStatus();
+</script>
+ 

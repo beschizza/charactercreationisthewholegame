@@ -1,0 +1,76 @@
+
+@font-face {
+    font-family: 'font';
+    src: url('font.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {font-family:font;font-size:32px;background-color:#111;line-height:1.1;text-align:center;color:white;
+font-smooth: never;
+-webkit-font-smoothing : none;
+letter-spacing:3px}
+
+#game {width:800px;height:500px;margin:20px auto;position:relative;background-color:#222;text-align:left;padding:12px; cursor: url('images/pointer.cur'),default;box-sizing:border-box; }
+
+h1 {font-size:64px;margin-top:1em}
+p {margin:0}
+
+img {image-rendering:pixelated;}
+
+#sprite {width:200px;height:200px;top:50px;left:50px;position:absolute;}
+
+#status {width:100%;position:absolute;top:15px;left:20px;}
+#sprite img {width:160px;}
+#stats {width:180px;height:200px;position:absolute;top:60px;left:220px;}
+#list {width:380px;height:200px;position:absolute;top:60px;left:430px;}
+#story {width:780px;left:20px;height:210px;position:absolute;top:280px;overflow:hidden;}
+
+.gold {color:#FF0;}
+.items {color:#F00;}
+.arrow {position:absolute;right:0;color:#FF0;}
+#points, #gold_count {color:#ff0;}
+.num,#exp_count {color:#0F0;}
+.oldtext {opacity:.7;}
+
+.num {width:30px;height:22px;display: inline-block;text-align:center;}
+.arrowWidth {width:20px;height:22px;display: inline-block;}
+.statWidth {width:60px;height:22px;display: inline-block;}
+
+/*different pages */
+#main {display:none;}
+#designCharacter {display:none;position:relative;}
+#hints {display:none;position:relative;width:80%;margin:30px auto;padding:20px;background-color:black;border:4px solid red;}
+
+
+/* INITIAL CHARACTER DESIGN SCREEN */
+.colorPick {width:30px;height:30px;display:inline;}
+button {border:none;}
+button:focus,input:focus {outline:0;}
+colorPick = function () {}
+input{font-family: inherit;font-size: inherit;}
+#charName {position:absolute;top:10px;left:10px;}
+#charRand {position:absolute;top:10px;right:10px;}
+#charNameInput {border:none;background-color:#222;color:red;}
+#charPreview {position:absolute;top:50px;left:10px;}
+#charControls {position:absolute;top:80px;left:170px;}
+#charBody {position:absolute;top:50px;right:10px;}
+#charColors {position:absolute;top:260px;left:10px;width:100%;    line-height: 1.4;}
+.charToyPick {width:40px;}
+.nextButton  {height:40px;}
+.charBodyImage {width:100px;opacity:.5}
+.pickerBar {position:absolute;right:20px;}
+.storyPic {    position: relative;
+    width: 35%;
+    display: inline;
+    float: right;
+border: 5px solid brown;}
+.storyBox {position:relative;width:80%;margin:30px auto;padding:20px;background-color:black;border:4px solid red;z-index:2}
+.storyButtons {position:relative;margin:15px 30px 0px 0px;text-align:right;width:100%;}
+.storyTitle {color:#FF0;}
+#composite {width:160px;position:absolute;}
+.part {position:absolute;width:100%;}
+.itemAttribute {color:#0cf;}
+.arrows {height:22px}
+.show {display:static;}
+.hide {display:none;}

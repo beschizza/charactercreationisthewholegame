@@ -1,0 +1,13 @@
+
+	/* When two stats go very low, remove the old vices and ... */
+	
+	else if (character.STR < 8 && character.INT < 8 && storyDweeb["played"] == 0 ) {	openStory (storyDweeb);		}  
+	else if (character.STR < 8 && character.DEX < 8 && storyDork["played"] == 0 ) {	openStory (storyDork);		}  
+	else if (character.STR < 8 && character.WIS < 8 && storyDoofus["played"] == 0 ) {	openStory (storyDoofus);		}  
+	else if (character.STR < 8 && character.CHA < 8 && storyDotard["played"] == 0 ) {	openStory (storyDotard);		}  
+	else if (character.INT < 8 && character.DEX < 8 && storyDolt["played"] == 0 ) {	openStory (storyDolt);		}  
+	else if (character.INT < 8 && character.WIS < 8 && storyDunce["played"] == 0 ) {	openStory (storyDunce);		}  
+	else if (character.INT < 8 && character.CHA < 8 && storyDumbo["played"] == 0 ) {	openStory (storyDumbo);		}  
+	else if (character.DEX < 8 && character.CHA < 8 && storyDouche["played"] == 0 ) {	openStory (storyDouche);		}  
+	else if (character.DEX < 8 && character.WIS < 8 && storyDerp["played"] == 0 ) {	openStory (storyDerp);		}  
+	else if (character.WIS < 8 && character.CHA < 8 && storyDope["played"] == 0 ) {	openStory (storyDope);		}  
