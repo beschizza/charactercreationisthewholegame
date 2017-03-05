@@ -9,16 +9,16 @@ console.log ("cadet? " + storyCadet["played"]);
 	║ 	  win bonus points for each advancement			║ 
 	╚═══════════════════════════════════════════════════╝	*/
 	
-	if (character.STR + character.DEX + character.INT > 52 && storyEngineer["played"] == 0) {				openStory (storyLordEngineer);		}
-	else if (character.STR + character.DEX + character.WIS > 52 && storyJustice["played"] == 0) {			openStory (storyLordJustice);		}
-	else if (character.STR + character.DEX + character.CHA > 52 && storyConstable["played"] == 0) {			openStory (storyLordConstable);		}
-	else if (character.STR + character.INT + character.WIS > 52 && storyTreasurer["played"] == 0) {			openStory (storyLordTreasurer);		}
-	else if (character.STR + character.INT + character.CHA > 52 && storyChamberlain["played"] == 0) {		openStory (storyLordChamberlain);	}	
-	else if (character.STR + character.WIS + character.CHA > 52 && storyMarshal["played"] == 0) {			openStory (storyLordMarshal);		}	
-	else if (character.DEX + character.INT + character.WIS > 52 && storyAmbassador["played"] == 0) {		openStory (storyLordAmbassador);	}
-	else if (character.DEX + character.INT + character.CHA > 52 && storyChancellor["played"] == 0) {		openStory (storyLordChancellor);	}	
-	else if (character.DEX + character.WIS + character.CHA > 52 && storySpymaster["played"] == 0) {			openStory (storyLordSpymaster);		}	
-	else if (character.INT + character.WIS + character.CHA > 52 && storyArchmage["played"] == 0) {			openStory (storyLordArchmage);		}
+	if (character.STR + character.DEX + character.INT > 52 && storyLordEngineer["played"] == 0) {				openStory (storyLordEngineer);		}
+	else if (character.STR + character.DEX + character.WIS > 52 && storyLordJustice["played"] == 0) {			openStory (storyLordJustice);		}
+	else if (character.STR + character.DEX + character.CHA > 52 && storyLordConstable["played"] == 0) {			openStory (storyLordConstable);		}
+	else if (character.STR + character.INT + character.WIS > 52 && storyLordTreasurer["played"] == 0) {			openStory (storyLordTreasurer);		}
+	else if (character.STR + character.INT + character.CHA > 52 && storyLordChamberlain["played"] == 0) {		openStory (storyLordChamberlain);	}	
+	else if (character.STR + character.WIS + character.CHA > 52 && storyLordMarshal["played"] == 0) {			openStory (storyLordMarshal);		}	
+	else if (character.DEX + character.INT + character.WIS > 52 && storyLordAmbassador["played"] == 0) {		openStory (storyLordAmbassador);	}
+	else if (character.DEX + character.INT + character.CHA > 52 && storyLordChancellor["played"] == 0) {		openStory (storyLordChancellor);	}	
+	else if (character.DEX + character.WIS + character.CHA > 52 && storyLordSpymaster["played"] == 0) {			openStory (storyLordSpymaster);		}	
+	else if (character.INT + character.WIS + character.CHA > 52 && storyLordArchmage["played"] == 0) {			openStory (storyLordArchmage);		}
 	
 	else if (character.STR + character.INT > 36 && storyCleric["played"] == 0 ) {						openStory (storyCleric);		}
 	else if (character.STR + character.DEX > 36 && storyRogue["played"] == 0 ) {						openStory (storyRogue);			}
