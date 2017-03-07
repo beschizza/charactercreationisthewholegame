@@ -302,14 +302,14 @@ var storyCadet = { //become a cadet
 var storyApprentice = { //xxx
 	played: 0,
 	title: "Magical apprenticeship?",
-	picture: "images/story1.png",
+	picture: "images/story2.png",
 	text: "You're smart enough, have read the grimoires, and a chance to join the Academy of Magic presents itself. You hear that life as an apprentice is tough...",
 	YES: "character.job='Apprentice'"}
 
 var storyPickpocket = { //xxx
 	played: 0,
 	title: "Sticky fingers?",
-	picture: "images/story1.png",
+	picture: "images/story3.png",
 	text: "After showing off card tricks to your mates, a shadowy figure approaches. 'You know, you could make a few bob picking pockets...'",
 	YES: "character.job='Pickpocket'"}
 	
@@ -354,21 +354,21 @@ var storyFeeble = { //xxx
 var storyFrail = { //xxx
 	played: 0,
 	title: "Frail",
-	picture: "images/story1.png",
+	picture: "images/story2.png",
 	text: "If the wind blew but a breath harder, you would fall to dust and vanish into the breeze",
 	OK: "traits.unshift('Frail')" 		}
 
 var storyClumsy = { //xxx
 	played: 0,
 	title: "Clumsy",
-	picture: "images/story1.png",
+	picture: "images/story2.png",
 	text: "You're a bit of a goof when it comes to physical co-ordination, but somehow it seems to focus you on the matters at hand.",
 	OK: "traits.unshift('Clumsy')" 		}
 
 var storyHamfisted = { //xxx
 	played: 0,
 	title: "Hamfisted ",
-	picture: "images/story1.png",
+	picture: "images/story2.png",
 	text: "Only a fool would entrust to you matters requiring a steady hand.",
 	OK: "traits.unshift('Hamfisted')" 	}
 
@@ -515,7 +515,7 @@ var storyDope = { //xxx
 var storyLithe = { //xxx
 	played: 0,
 	title: "Lithe",
-	picture: "images/story1.png",
+	picture: "images/story3.png",
 	text: "The very movements of your body seem almost magical. Some are suspicious of it.",
 	OK: "traits.unshift('Lithe')"}
 	
@@ -585,7 +585,7 @@ var storyReckless = { //xxx
 var storySnob = { //xxx
 	played: 0,
 	title: "Snob",
-	picture: "images/story1.png",
+	picture: "images/story2.png",
 	text: "Your obsession with good taste leaves a bad taste in others' mouths.",
 	OK: "traits.unshift('Snob')"}
   
@@ -648,7 +648,7 @@ var storyImperious = { //xxx
 var storySmug = { //xxx
 	played: 0,
 	title: "smug",
-	picture: "images/story1.png",
+	picture: "images/story2.png",
 	text: "Your effortless ability to appear self-satisfied has been noted by all.",
 	OK: "traits.unshift('Smug')"}
 
