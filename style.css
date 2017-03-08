@@ -73,7 +73,7 @@ input{font-family: inherit;font-size: inherit;}
     display: inline;
     float: right;
 border: 5px solid brown;}
-.storyBox {position:relative;width:80%;margin:30px auto;padding:20px;background-color:black;border:4px solid red;z-index:2}
+.storyBox {position:relative;width:80%;margin:30px auto;padding:20px;background-color:black;border:4px solid red;z-index:2overflow:auto;}
 .storyButtons {position:relative;margin:15px 30px 0px 0px;text-align:right;width:100%;}
 .storyTitle {color:#FF0;}
 #composite {width:160px;position:absolute;}
