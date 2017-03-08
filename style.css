@@ -82,3 +82,11 @@ border: 5px solid brown;}
 .arrows {height:22px}
 .show {display:static;}
 .hide {display:none;}
+#retirement {
+  height: 100%;
+  overflow:hidden
+}
+#retirementText {
+  height: 100%;
+  overflow: auto;
+}
