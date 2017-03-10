@@ -218,7 +218,27 @@ function point(attribute,step) { // When player increases or decreases an attrib
 	else {
 		document.getElementById("points").innerHTML = character.points + " points left";
 	}
+	//
+	if(character.points == 0){
+	document.getElementById("arrowSTRup").style.display = "none";
+	document.getElementById("arrowDEXup").style.display = "none";
+	document.getElementById("arrowINTup").style.display = "none";
+	document.getElementById("arrowWISup").style.display = "none";
+	document.getElementById("arrowCHAup").style.display = "none";		
+	}else{
+	document.getElementById("arrowSTRup").style.display = "inline";
+	document.getElementById("arrowDEXup").style.display = "inline";
+	document.getElementById("arrowINTup").style.display = "inline";
+	document.getElementById("arrowWISup").style.display = "inline";
+	document.getElementById("arrowCHAup").style.display = "inline";	
+	}
 	
+	if(character.STR == 6){document.getElementById("arrowSTRdown").style.display = "none";}
+	if(character.DEX == 6){document.getElementById("arrowDEXdown").style.display = "none";}
+	if(character.INT == 6){document.getElementById("arrowINTdown").style.display = "none";}
+	if(character.WIS == 6){document.getElementById("arrowWISdown").style.display = "none";}
+	if(character.CHA == 6){document.getElementById("arrowCHAdown").style.display = "none";}
+	//
 	levelup(character.exp);
 	
 	careers(); //check for career change before nextTurn. in careers.js
