@@ -14,7 +14,7 @@ each episode no more than 200 characters
 
 function generateQuestStory() {	
 	if (character.job == "Kiddo" || !storyFlavor[character.job]) { //jobless youths or jobs with missing stories get flavor text based on highest stat
-		var flavorText =  "When not " + pick(storyFlavor[highestStat]) + ", ";
+		var flavorText = "When not " + pick(storyFlavor[character.highestStat()]) + ", ";
 	}
 	else {
 		var flavorText = "between " + pick(storyFlavor[character.job]) + " and " + pick(storyFlavor[character.job]) + ", "

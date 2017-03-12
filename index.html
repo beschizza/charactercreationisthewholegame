@@ -23,6 +23,9 @@ pick=function (x) {
 	return pick;
 }
 
+/* constants */
+var STATNAMES = ["STR", "DEX", "INT", "WIS", "CHA"];
+var EXP_BREAKPOINTS = [0, 50, 100, 200, 400, 800, 1200, 2000, 3000, 4000];
 
 /* load sounds */
 var clicky = new Audio('sounds/1.wav');
@@ -53,13 +56,15 @@ var character = {
 	pants:Math.ceil(Math.random(1)*3),pantsColor:"777777",
 	shirt:Math.ceil(Math.random(1)*7),shirtColor:"cccccc",
 	boots:1,
-	toy:Math.floor(Math.random(1)*5)
-}
+	toy:Math.floor(Math.random(1)*5),
 
-	var stats = []; //to be used to calculate highest stat
-	var highestStat = ""; //to be used to calculate highest stat
-	var traits = ['Healthy','Hopeful','Young']; //should be put in the character object
-	var elixir;
+	// Utility functions
+	highestStat: function() { return STATNAMES.reduce(function(a, b){ return this[a] > this[b] ? a : b }); },
+	canIncreaseStat: function(stat) { return this.points > 0 },
+	canDecreaseStat: function(stat) { return this[stat] > 6 && this[stat] < 12 }
+}
+var traits = ['Healthy','Hopeful','Young']; //should be put in the character object
+var elixir;
 	
 /* TITLE SCREEN FUNCTIONS */
 
@@ -203,7 +208,6 @@ function mainGame () { // move to the main game screen
 function point(attribute,step) { // When player increases or decreases an attribute
 	clicky.play(); 	
 	character[attribute]+=step;
-	document.getElementById(attribute).innerHTML = character[attribute];
 	
 	if (step == 1) {
 		character.points--;
@@ -212,16 +216,11 @@ function point(attribute,step) { // When player increases or decreases an attrib
 		character.points++;
 	}
 	
-	if (character.points == 1) {
-		document.getElementById("points").innerHTML = character.points + " point left";
-	}
-	else {
-		document.getElementById("points").innerHTML = character.points + " points left";
-	}
-	
 	levelup(character.exp);
 	
 	careers(); //check for career change before nextTurn. in careers.js
+
+	drawStatus();
 }
 
 function nextTurn() {
@@ -234,38 +233,8 @@ function nextTurn() {
 		character.inventory.push(newItem);
 		character.age++;
 	
-
-	stats = {	STR: character.STR,	DEX: character.DEX,	INT: character.INT,	WIS: character.WIS,	CHA: character.CHA} 	//Temporary array to make it easier to	
-	
-	highestStat = Object.keys(stats).reduce(function(a, b){ return stats[a] > stats[b] ? a : b }); 						//find the highest stat
-	
 	generateQuestStory(); // displays it to the text box
 
-	//hide or reveal the increase/decrease stat arrows
-	
-	if (character.points < 1 ) {
-	
-		document.getElementById("arrowSTRup").style.display = "none";
-		document.getElementById("arrowDEXup").style.display = "none";
-		document.getElementById("arrowINTup").style.display = "none";
-		document.getElementById("arrowWISup").style.display = "none";
-		document.getElementById("arrowCHAup").style.display = "none";
-		document.getElementById("retirementButton").style.display = "block";
-	}
-	else {
-		document.getElementById("arrowSTRup").style.display = "inline";
-		document.getElementById("arrowDEXup").style.display = "inline";
-		document.getElementById("arrowINTup").style.display = "inline";
-		document.getElementById("arrowWISup").style.display = "inline";
-		document.getElementById("arrowCHAup").style.display = "inline";
-	}
-
-	if (character.STR < 7 || character.STR > 11) {document.getElementById("arrowSTRdown").style.display = "none";}
-	if (character.DEX < 7 || character.DEX > 11) {document.getElementById("arrowDEXdown").style.display = "none";}
-	if (character.INT < 7 || character.INT > 11) {document.getElementById("arrowINTdown").style.display = "none";}
-	if (character.WIS < 7 || character.WIS > 11) {document.getElementById("arrowWISdown").style.display = "none";}
-	if (character.CHA < 7 || character.CHA > 11) {document.getElementById("arrowCHAdown").style.display = "none";}
-	
 	//age effects
 	if (character.age > 59) { document.getElementById("retirementButton").style.display = "block";}
 	
@@ -281,7 +250,7 @@ function nextTurn() {
 		character.hair=0;draw();
 	}
 	
-		drawStatus();
+	drawStatus();
 }
 
 
@@ -294,17 +263,8 @@ function updateStory(text) { // UPDATES THE STORY BOX TEXT
 }
 
 function levelup(exp) { //CHECK FOR LEVEL UP
-	switch(true) {
-		case (exp > 4000):	character.level=10;	break;	
-		case (exp > 3000):	character.level=9;	break;
-		case (exp > 2000):	character.level=8;	break; 
-		case (exp > 1200):	character.level=7;	break;
-		case (exp > 800):	character.level=6;	break; 
-		case (exp > 400):	character.level=5;	break;
-		case (exp > 200):	character.level=4;	break; 
-		case (exp > 100):	character.level=3;	break;
-		case (exp > 50):	character.level=2;	break; 
-		default: character.level=1;	break;	
+	while (character.exp > EXP_BREAKPOINTS[character.level]) {
+		character.level++;
 	}
 }
 
@@ -313,17 +273,19 @@ function levelup(exp) { //CHECK FOR LEVEL UP
 
 function drawStatus() { // redraws the stats and character after something changes
 	document.getElementById("status").innerHTML = character.name + ", level <span class='num'>" + character.level + " </span> " + character.job + ", Age <span class='num'>" + character.age + "</span>";
-	document.getElementById("STR").innerHTML= character.STR; 
-	document.getElementById("DEX").innerHTML= character.DEX; 
-	document.getElementById("INT").innerHTML= character.INT; 
-	document.getElementById("WIS").innerHTML= character.WIS; 
-	document.getElementById("CHA").innerHTML= character.CHA; 
 	document.getElementById("gold_count").innerHTML= character.gold + "g"; 
 	document.getElementById("exp_count").innerHTML= character.exp + "xp";
 	document.getElementById("item1").innerHTML= traits[0];
 	document.getElementById("item2").innerHTML= traits[1];
 	document.getElementById("item3").innerHTML= traits[2];
-	document.getElementById("points").innerHTML= "Points left: " + character.points;
+	document.getElementById("points").innerHTML = "Points left: " + character.points;
+
+	// hide or reveal each stat arrow, and update the numeric display
+	STATNAMES.forEach(function (stat) {
+		document.getElementById("arrow" + stat + "up").style.display = character.canIncreaseStat(stat) ? "inline" : "none";
+		document.getElementById("arrow" + stat + "down").style.display = character.canDecreaseStat(stat) ? "inline" : "none";
+		document.getElementById(stat).innerHTML = character[stat];
+	})
 }
 
 
