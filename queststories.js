@@ -132,14 +132,14 @@ storyFlavor["Bandit"] = new Array('leading your motley crew of troublemakers','l
 
 storyFlavor["Magister"] = new Array('outwitting the wizards in the halls of power','ensuring secular learning reigns supreme','employing the lands’ finest scholars','manufacturing "ancient" scrolls','ensnarling your enemies in bureacracy');
 
-storyFlavor["LordEngineer"] = new Array('Spending the kingdom\'s cash on mad machines','causing mysterious explosions','draining the actual swamp');
-storyFlavor["LordJustice"] = new Array('signing death warrants','dusting off your wigs','extending the reach of jurisprudence');
-storyFlavor["LordConstable"] = new Array('leading needless marches','breeding pigs','collecting donations');
-storyFlavor["LordTreasurer"] = new Array('constructing vaults','swimming in oceans of coin','having inflation explained to you');
-storyFlavor["LordChamberlain"] = new Array('undermining all others','sneering at nobles','polishing the privy seal');
-storyFlavor["LordAmbassador"] = new Array('keeping a safe distance','learning languages','silvering thine own tongue');
-storyFlavor["LordChancellor"] = new Array('keeping the king happy','undermining the Lord Chamberlain','checking others\' power');
-storyFlavor["LordSpymaster"] = new Array('sneaking','hiring assassins','skulking');
-storyFlavor["LordArchmage"] = new Array('living in a realm of total abstraction','laughing maniacally','turning Lord Chamberlain into a frog');
-storyFlavor["LordMarshal"] = new Array('raising new legions','assuring others\' loyalty','suppressing rebellions');
+storyFlavor["Engineer"] = new Array('Spending the kingdom\'s cash on mad machines','causing mysterious explosions','draining the actual swamp');
+storyFlavor["Justice"] = new Array('signing death warrants','dusting off your wigs','extending the reach of jurisprudence');
+storyFlavor["Constable"] = new Array('leading needless marches','breeding pigs','collecting donations');
+storyFlavor["Treasurer"] = new Array('constructing vaults','swimming in oceans of coin','having inflation explained to you');
+storyFlavor["Chamberlain"] = new Array('undermining all others','sneering at nobles','polishing the privy seal');
+storyFlavor["Ambassador"] = new Array('keeping a safe distance','learning languages','silvering thine own tongue');
+storyFlavor["Chancellor"] = new Array('keeping the king happy','undermining the Lord Chamberlain','checking others\' power');
+storyFlavor["Spymaster"] = new Array('sneaking','hiring assassins','skulking');
+storyFlavor["Archmage"] = new Array('living in a realm of total abstraction','laughing maniacally','turning Lord Chamberlain into a frog');
+storyFlavor["Marshal"] = new Array('raising new legions','assuring others\' loyalty','suppressing rebellions');
 
