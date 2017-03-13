@@ -67,11 +67,11 @@ console.log ("cadet? " + storyCadet["played"]);
 		else if (storyCupbearer["played"] != 0  && storyResearcher["played"] == 0 && character.job != "Cupbearer") {	openStory (storyResearcher);}
 		else if (storyStagehand["played"] != 0  && storyEntertainer["played"] == 0 && character.job != "Stagehand") {	openStory (storyEntertainer);}
 	
-	else if (highestStat == "STR" && character.STR > 10  && storyCadet["played"] == 0 ) {						openStory (storyCadet);}
-	else if (highestStat == "INT" && character.INT > 10  && storyApprentice["played"] == 0 ) {					openStory (storyApprentice);}
-	else if (highestStat == "DEX" && character.DEX > 10  && storyPickpocket["played"] == 0 ) {					openStory (storyPickpocket);}	
-	else if (highestStat == "WIS" && character.WIS > 10  && storyCupbearer["played"] == 0 ) {					openStory (storyCupbearer);}	
-	else if (highestStat == "CHA" && character.CHA > 10  && storyStagehand["played"] == 0 ) {					openStory (storyStagehand);}  
+	else if (character.highestStat() == "STR" && character.STR > 10  && storyCadet["played"] == 0 ) {						openStory (storyCadet);}
+	else if (character.highestStat() == "INT" && character.INT > 10 && storyApprentice["played"] == 0) { openStory(storyApprentice); }
+	else if (character.highestStat() == "DEX" && character.DEX > 10 && storyPickpocket["played"] == 0) { openStory(storyPickpocket); }
+	else if (character.highestStat() == "WIS" && character.WIS > 10 && storyCupbearer["played"] == 0) { openStory(storyCupbearer); }
+	else if (character.highestStat() == "CHA" && character.CHA > 10 && storyStagehand["played"] == 0) { openStory(storyStagehand); }
 
 
 

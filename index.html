@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <head>
 <title>Character Creation Is The Whole Game</title>
 <meta charset="utf-8">
@@ -23,6 +23,9 @@ pick=function (x) {
 	return pick;
 }
 
+/* constants */
+var STATNAMES = ["STR", "DEX", "INT", "WIS", "CHA"];
+var EXP_BREAKPOINTS = [0, 50, 100, 200, 400, 800, 1200, 2000, 3000, 4000];
 
 /* load sounds */
 var clicky = new Audio('sounds/1.wav');
@@ -53,13 +56,15 @@ var character = {
 	pants:Math.ceil(Math.random(1)*3),pantsColor:"777777",
 	shirt:Math.ceil(Math.random(1)*7),shirtColor:"cccccc",
 	boots:1,
-	toy:Math.floor(Math.random(1)*5)
-}
+	toy:Math.floor(Math.random(1)*5),
 
-	var stats = []; //to be used to calculate highest stat
-	var highestStat = ""; //to be used to calculate highest stat
-	var traits = ['Healthy','Hopeful','Young']; //should be put in the character object
-	var elixir;
+	// Utility functions
+	highestStat: function() { return STATNAMES.reduce(function(a, b){ return this[a] > this[b] ? a : b }); },
+	canIncreaseStat: function(stat) { return this.points > 0 },
+	canDecreaseStat: function(stat) { return this[stat] > 6 && this[stat] < 12 }
+}
+var traits = ['Healthy','Hopeful','Young']; //should be put in the character object
+var elixir;
 	
 /* TITLE SCREEN FUNCTIONS */
 
@@ -203,7 +208,6 @@ function mainGame () { // move to the main game screen
 function point(attribute,step) { // When player increases or decreases an attribute
 	clicky.play(); 	
 	character[attribute]+=step;
-	document.getElementById(attribute).innerHTML = character[attribute];
 	
 	if (step == 1) {
 		character.points--;
@@ -212,16 +216,11 @@ function point(attribute,step) { // When player increases or decreases an attrib
 		character.points++;
 	}
 	
-	if (character.points == 1) {
-		document.getElementById("points").innerHTML = character.points + " point left";
-	}
-	else {
-		document.getElementById("points").innerHTML = character.points + " points left";
-	}
-	
 	levelup(character.exp);
 	
 	careers(); //check for career change before nextTurn. in careers.js
+
+	drawStatus();
 }
 
 function nextTurn() {
@@ -234,38 +233,8 @@ function nextTurn() {
 		character.inventory.push(newItem);
 		character.age++;
 	
-
-	stats = {	STR: character.STR,	DEX: character.DEX,	INT: character.INT,	WIS: character.WIS,	CHA: character.CHA} 	//Temporary array to make it easier to	
-	
-	highestStat = Object.keys(stats).reduce(function(a, b){ return stats[a] > stats[b] ? a : b }); 						//find the highest stat
-	
 	generateQuestStory(); // displays it to the text box
 
-	//hide or reveal the increase/decrease stat arrows
-	
-	if (character.points < 1 ) {
-	
-		document.getElementById("arrowSTRup").style.display = "none";
-		document.getElementById("arrowDEXup").style.display = "none";
-		document.getElementById("arrowINTup").style.display = "none";
-		document.getElementById("arrowWISup").style.display = "none";
-		document.getElementById("arrowCHAup").style.display = "none";
-		document.getElementById("retirementButton").style.display = "block";
-	}
-	else {
-		document.getElementById("arrowSTRup").style.display = "inline";
-		document.getElementById("arrowDEXup").style.display = "inline";
-		document.getElementById("arrowINTup").style.display = "inline";
-		document.getElementById("arrowWISup").style.display = "inline";
-		document.getElementById("arrowCHAup").style.display = "inline";
-	}
-
-	if (character.STR < 7 || character.STR > 11) {document.getElementById("arrowSTRdown").style.display = "none";}
-	if (character.DEX < 7 || character.DEX > 11) {document.getElementById("arrowDEXdown").style.display = "none";}
-	if (character.INT < 7 || character.INT > 11) {document.getElementById("arrowINTdown").style.display = "none";}
-	if (character.WIS < 7 || character.WIS > 11) {document.getElementById("arrowWISdown").style.display = "none";}
-	if (character.CHA < 7 || character.CHA > 11) {document.getElementById("arrowCHAdown").style.display = "none";}
-	
 	//age effects
 	if (character.age > 59) { document.getElementById("retirementButton").style.display = "block";}
 	
@@ -281,7 +250,7 @@ function nextTurn() {
 		character.hair=0;draw();
 	}
 	
-		drawStatus();
+	drawStatus();
 }
 
 
@@ -294,17 +263,8 @@ function updateStory(text) { // UPDATES THE STORY BOX TEXT
 }
 
 function levelup(exp) { //CHECK FOR LEVEL UP
-	switch(true) {
-		case (exp > 4000):	character.level=10;	break;	
-		case (exp > 3000):	character.level=9;	break;
-		case (exp > 2000):	character.level=8;	break; 
-		case (exp > 1200):	character.level=7;	break;
-		case (exp > 800):	character.level=6;	break; 
-		case (exp > 400):	character.level=5;	break;
-		case (exp > 200):	character.level=4;	break; 
-		case (exp > 100):	character.level=3;	break;
-		case (exp > 50):	character.level=2;	break; 
-		default: character.level=1;	break;	
+	while (character.exp > EXP_BREAKPOINTS[character.level]) {
+		character.level++;
 	}
 }
 
@@ -313,17 +273,19 @@ function levelup(exp) { //CHECK FOR LEVEL UP
 
 function drawStatus() { // redraws the stats and character after something changes
 	document.getElementById("status").innerHTML = character.name + ", level <span class='num'>" + character.level + " </span> " + character.job + ", Age <span class='num'>" + character.age + "</span>";
-	document.getElementById("STR").innerHTML= character.STR; 
-	document.getElementById("DEX").innerHTML= character.DEX; 
-	document.getElementById("INT").innerHTML= character.INT; 
-	document.getElementById("WIS").innerHTML= character.WIS; 
-	document.getElementById("CHA").innerHTML= character.CHA; 
 	document.getElementById("gold_count").innerHTML= character.gold + "g"; 
 	document.getElementById("exp_count").innerHTML= character.exp + "xp";
 	document.getElementById("item1").innerHTML= traits[0];
 	document.getElementById("item2").innerHTML= traits[1];
 	document.getElementById("item3").innerHTML= traits[2];
-	document.getElementById("points").innerHTML= "Points left: " + character.points;
+	document.getElementById("points").innerHTML = "Points left: " + character.points;
+
+	// hide or reveal each stat arrow, and update the numeric display
+	STATNAMES.forEach(function (stat) {
+		document.getElementById("arrow" + stat + "up").style.display = character.canIncreaseStat(stat) ? "inline" : "none";
+		document.getElementById("arrow" + stat + "down").style.display = character.canDecreaseStat(stat) ? "inline" : "none";
+		document.getElementById(stat).innerHTML = character[stat];
+	})
 }
 
 
@@ -501,90 +463,90 @@ function retirement(message) {
 <div id="charColors">
 	<div id="">Skin tone
 		<span class="pickerBar">
-			<button class="colorPick" style="background-color:#fbf2f2" id="" onClick="character.skinColor='fbf2f2';draw();" src="">
-			<button class="colorPick" style="background-color:#facfcd" id="" onClick="character.skinColor='facfcd';draw();" src="">
-			<button class="colorPick" style="background-color:#f2ceba" id="" onClick="character.skinColor='f2ceba';draw();" src="">
-			<button class="colorPick" style="background-color:#f0c898" id="" onClick="character.skinColor='f0c898';draw();" src="">
-			<button class="colorPick" style="background-color:#e2c88f" id="" onClick="character.skinColor='e2c88f';draw();" src="">
-			<button class="colorPick" style="background-color:#d2ac78" id="" onClick="character.skinColor='d2ac78';draw();" src="">
-			<button class="colorPick" style="background-color:#d39667" id="" onClick="character.skinColor='d39667';draw();" src="">
-			<button class="colorPick" style="background-color:#ac7249" id="" onClick="character.skinColor='ac7249';draw();" src="">
-			<button class="colorPick" style="background-color:#935f4f" id="" onClick="character.skinColor='935f4f';draw();" src="">
-			<button class="colorPick" style="background-color:#663d1b" id="" onClick="character.skinColor='663d1b';draw();" src="">
-			<button class="colorPick" style="background-color:#411f02" id="" onClick="character.skinColor='411f02';draw();" src="">
-			<button class="colorPick" style="background-color:#29180b" id="" onClick="character.skinColor='29180b';draw();" src="">
-			<button class="colorPick" style="background-color:#19130d" id="" onClick="character.skinColor='19130d';draw();" src="">
-			<button class="colorPick" style="background-color:#bb3c3c" id="" onClick="character.skinColor='bb3c3c';draw();" src="">
-			<button class="colorPick" style="background-color:#6783b2" id="" onClick="character.skinColor='6783b2';draw();" src="">
-			<button class="colorPick" style="background-color:#58782b" id="" onClick="character.skinColor='58782b';draw();" src="">
-			<button class="colorPick" style="background-color:#714480" id="" onClick="character.skinColor='714480';draw();" src="">
+			<button class="colorPick" style="background-color:#fbf2f2" id="" onClick="character.skinColor='fbf2f2';draw();" src="" />
+			<button class="colorPick" style="background-color:#facfcd" id="" onClick="character.skinColor='facfcd';draw();" src="" />
+			<button class="colorPick" style="background-color:#f2ceba" id="" onClick="character.skinColor='f2ceba';draw();" src="" />
+			<button class="colorPick" style="background-color:#f0c898" id="" onClick="character.skinColor='f0c898';draw();" src="" />
+			<button class="colorPick" style="background-color:#e2c88f" id="" onClick="character.skinColor='e2c88f';draw();" src="" />
+			<button class="colorPick" style="background-color:#d2ac78" id="" onClick="character.skinColor='d2ac78';draw();" src="" />
+			<button class="colorPick" style="background-color:#d39667" id="" onClick="character.skinColor='d39667';draw();" src="" />
+			<button class="colorPick" style="background-color:#ac7249" id="" onClick="character.skinColor='ac7249';draw();" src="" />
+			<button class="colorPick" style="background-color:#935f4f" id="" onClick="character.skinColor='935f4f';draw();" src="" />
+			<button class="colorPick" style="background-color:#663d1b" id="" onClick="character.skinColor='663d1b';draw();" src="" />
+			<button class="colorPick" style="background-color:#411f02" id="" onClick="character.skinColor='411f02';draw();" src="" />
+			<button class="colorPick" style="background-color:#29180b" id="" onClick="character.skinColor='29180b';draw();" src="" />
+			<button class="colorPick" style="background-color:#19130d" id="" onClick="character.skinColor='19130d';draw();" src="" />
+			<button class="colorPick" style="background-color:#bb3c3c" id="" onClick="character.skinColor='bb3c3c';draw();" src="" />
+			<button class="colorPick" style="background-color:#6783b2" id="" onClick="character.skinColor='6783b2';draw();" src="" />
+			<button class="colorPick" style="background-color:#58782b" id="" onClick="character.skinColor='58782b';draw();" src="" />
+			<button class="colorPick" style="background-color:#714480" id="" onClick="character.skinColor='714480';draw();" src="" />
 		</span>
 	</div>
 
 	<div id="">Hair tint
 		<span class="pickerBar">
-			<button class="colorPick" style="background-color:#f8f4f4" id="" onClick="character.hairColor='f8f4f4';draw();" src="">
-			<button class="colorPick" style="background-color:#ded4be" id="" onClick="character.hairColor='ded4be';draw();" src="">
-			<button class="colorPick" style="background-color:#ceb985" id="" onClick="character.hairColor='ceb985';draw();" src="">
-			<button class="colorPick" style="background-color:#aa9472" id="" onClick="character.hairColor='aa9472';draw();" src="">
-			<button class="colorPick" style="background-color:#f0cd78" id="" onClick="character.hairColor='f0cd78';draw();" src="">
-			<button class="colorPick" style="background-color:#d4a24b" id="" onClick="character.hairColor='d4a24b';draw();" src="">
-			<button class="colorPick" style="background-color:#ca6d11" id="" onClick="character.hairColor='ca6d11';draw();" src="">
-			<button class="colorPick" style="background-color:#92481c" id="" onClick="character.hairColor='92481c';draw();" src="">
-			<button class="colorPick" style="background-color:#712905" id="" onClick="character.hairColor='712905';draw();" src="">
-			<button class="colorPick" style="background-color:#432618" id="" onClick="character.hairColor='432618';draw();" src="">
-			<button class="colorPick" style="background-color:#2a2522" id="" onClick="character.hairColor='2a2522';draw();" src="">
-			<button class="colorPick" style="background-color:#19130d" id="" onClick="character.hairColor='19130d';draw();" src="">
-			<button class="colorPick" style="background-color:#666666" id="" onClick="character.hairColor='666666';draw();" src="">
-			<button class="colorPick" style="background-color:#b0b0b0" id="" onClick="character.hairColor='b0b0b0';draw();" src="">
-			<button class="colorPick" style="background-color:#c73030" id="" onClick="character.hairColor='c73030';draw();" src="">
-			<button class="colorPick" style="background-color:#2d5bdf" id="" onClick="character.hairColor='2d5bdf';draw();" src="">
-			<button class="colorPick" style="background-color:#26af30" id="" onClick="character.hairColor='26af30';draw();" src="">
+			<button class="colorPick" style="background-color:#f8f4f4" id="" onClick="character.hairColor='f8f4f4';draw();" src="" />
+			<button class="colorPick" style="background-color:#ded4be" id="" onClick="character.hairColor='ded4be';draw();" src="" />
+			<button class="colorPick" style="background-color:#ceb985" id="" onClick="character.hairColor='ceb985';draw();" src="" />
+			<button class="colorPick" style="background-color:#aa9472" id="" onClick="character.hairColor='aa9472';draw();" src="" />
+			<button class="colorPick" style="background-color:#f0cd78" id="" onClick="character.hairColor='f0cd78';draw();" src="" />
+			<button class="colorPick" style="background-color:#d4a24b" id="" onClick="character.hairColor='d4a24b';draw();" src="" />
+			<button class="colorPick" style="background-color:#ca6d11" id="" onClick="character.hairColor='ca6d11';draw();" src="" />
+			<button class="colorPick" style="background-color:#92481c" id="" onClick="character.hairColor='92481c';draw();" src="" />
+			<button class="colorPick" style="background-color:#712905" id="" onClick="character.hairColor='712905';draw();" src="" />
+			<button class="colorPick" style="background-color:#432618" id="" onClick="character.hairColor='432618';draw();" src="" />
+			<button class="colorPick" style="background-color:#2a2522" id="" onClick="character.hairColor='2a2522';draw();" src="" />
+			<button class="colorPick" style="background-color:#19130d" id="" onClick="character.hairColor='19130d';draw();" src="" />
+			<button class="colorPick" style="background-color:#666666" id="" onClick="character.hairColor='666666';draw();" src="" />
+			<button class="colorPick" style="background-color:#b0b0b0" id="" onClick="character.hairColor='b0b0b0';draw();" src="" />
+			<button class="colorPick" style="background-color:#c73030" id="" onClick="character.hairColor='c73030';draw();" src="" />
+			<button class="colorPick" style="background-color:#2d5bdf" id="" onClick="character.hairColor='2d5bdf';draw();" src="" />
+			<button class="colorPick" style="background-color:#26af30" id="" onClick="character.hairColor='26af30';draw();" src="" />
 		</span>
 	</div>
 
 	<div id="charColor">Fave color
 		<span class="pickerBar">
-			<button class="colorPick" style="background-color:#FF0000" id="" onClick="character.shirtColor='FF0000';draw();" src="">
-			<button class="colorPick" style="background-color:#ffc500" id="" onClick="character.shirtColor='ffc500';draw();" src="">
-			<button class="colorPick" style="background-color:#f2fc02" id="" onClick="character.shirtColor='f2fc02';draw();" src="">
-			<button class="colorPick" style="background-color:#96ed0d" id="" onClick="character.shirtColor='96ed0d';draw();" src="">
-			<button class="colorPick" style="background-color:#00c0f7" id="" onClick="character.shirtColor='00c0f7';draw();" src="">
-			<button class="colorPick" style="background-color:#4469ff" id="" onClick="character.shirtColor='4469ff';draw();" src="">
-			<button class="colorPick" style="background-color:#840bc2" id="" onClick="character.shirtColor='840bc2';draw();" src="">
-			<button class="colorPick" style="background-color:#d436a2" id="" onClick="character.shirtColor='d436a2';draw();" src="">
-			<button class="colorPick" style="background-color:#6f0909" id="" onClick="character.shirtColor='6f0909';draw();" src="">
-			<button class="colorPick" style="background-color:#354806" id="" onClick="character.shirtColor='354806';draw();" src="">
-			<button class="colorPick" style="background-color:#ab4f49" id="" onClick="character.shirtColor='ab4f49';draw();" src="">
-			<button class="colorPick" style="background-color:#446395" id="" onClick="character.shirtColor='446395';draw();" src="">
-			<button class="colorPick" style="background-color:#4e055b" id="" onClick="character.shirtColor='4e055b';draw();" src="">
-			<button class="colorPick" style="background-color:#00007f" id="" onClick="character.shirtColor='00007f';draw();" src="">
-			<button class="colorPick" style="background-color:#000000" id="" onClick="character.shirtColor='000000';draw();" src="">
-			<button class="colorPick" style="background-color:#6f6f6f" id="" onClick="character.shirtColor='6f6f6f';draw();" src="">
-			<button class="colorPick" style="background-color:#FFFFFF" id="" onClick="character.shirtColor='FFFFFF';draw();" src="">
+			<button class="colorPick" style="background-color:#FF0000" id="" onClick="character.shirtColor='FF0000';draw();" src="" />
+			<button class="colorPick" style="background-color:#ffc500" id="" onClick="character.shirtColor='ffc500';draw();" src="" />
+			<button class="colorPick" style="background-color:#f2fc02" id="" onClick="character.shirtColor='f2fc02';draw();" src="" />
+			<button class="colorPick" style="background-color:#96ed0d" id="" onClick="character.shirtColor='96ed0d';draw();" src="" />
+			<button class="colorPick" style="background-color:#00c0f7" id="" onClick="character.shirtColor='00c0f7';draw();" src="" />
+			<button class="colorPick" style="background-color:#4469ff" id="" onClick="character.shirtColor='4469ff';draw();" src="" />
+			<button class="colorPick" style="background-color:#840bc2" id="" onClick="character.shirtColor='840bc2';draw();" src="" />
+			<button class="colorPick" style="background-color:#d436a2" id="" onClick="character.shirtColor='d436a2';draw();" src="" />
+			<button class="colorPick" style="background-color:#6f0909" id="" onClick="character.shirtColor='6f0909';draw();" src="" />
+			<button class="colorPick" style="background-color:#354806" id="" onClick="character.shirtColor='354806';draw();" src="" />
+			<button class="colorPick" style="background-color:#ab4f49" id="" onClick="character.shirtColor='ab4f49';draw();" src="" />
+			<button class="colorPick" style="background-color:#446395" id="" onClick="character.shirtColor='446395';draw();" src="" />
+			<button class="colorPick" style="background-color:#4e055b" id="" onClick="character.shirtColor='4e055b';draw();" src="" />
+			<button class="colorPick" style="background-color:#00007f" id="" onClick="character.shirtColor='00007f';draw();" src="" />
+			<button class="colorPick" style="background-color:#000000" id="" onClick="character.shirtColor='000000';draw();" src="" />
+			<button class="colorPick" style="background-color:#6f6f6f" id="" onClick="character.shirtColor='6f6f6f';draw();" src="" />
+			<button class="colorPick" style="background-color:#FFFFFF" id="" onClick="character.shirtColor='FFFFFF';draw();" src="" />
 		</span>
 	</div>
 	
 	
 	<div id="charColor">Accent color
 		<span class="pickerBar">
-			<button class="colorPick" style="background-color:#9a0000" id="" onClick="character.pantsColor='9a0000';draw();" src="">
-			<button class="colorPick" style="background-color:#9a8900" id="" onClick="character.pantsColor='9a8900';draw();" src="">
-			<button class="colorPick" style="background-color:#9abc02" id="" onClick="character.pantsColor='9abc02';draw();" src="">
-			<button class="colorPick" style="background-color:#679d0d" id="" onClick="character.pantsColor='679d0d';draw();" src="">
-			<button class="colorPick" style="background-color:#008097" id="" onClick="character.pantsColor='008097';draw();" src="">
-			<button class="colorPick" style="background-color:#23399f" id="" onClick="character.pantsColor='23399f';draw();" src="">
-			<button class="colorPick" style="background-color:#560b72" id="" onClick="character.pantsColor='560b72';draw();" src="">
-			<button class="colorPick" style="background-color:#ab1672" id="" onClick="character.pantsColor='ab1672';draw();" src="">
-			<button class="colorPick" style="background-color:#340909" id="" onClick="character.pantsColor='340909';draw();" src="">
-			<button class="colorPick" style="background-color:#122806" id="" onClick="character.pantsColor='122806';draw();" src="">
-			<button class="colorPick" style="background-color:#672f29" id="" onClick="character.pantsColor='672f29';draw();" src="">
-			<button class="colorPick" style="background-color:#233355" id="" onClick="character.pantsColor='233355';draw();" src="">
-			<button class="colorPick" style="background-color:#12052b" id="" onClick="character.pantsColor='12052b';draw();" src="">
-			<button class="colorPick" style="background-color:#00003f" id="" onClick="character.pantsColor='00003f';draw();" src="">
-			<button class="colorPick" style="background-color:#000000" id="" onClick="character.pantsColor='000000';draw();" src="">
-			<button class="colorPick" style="background-color:#343f3f" id="" onClick="character.pantsColor='343f3f';draw();" src="">
-			<button class="colorPick" style="background-color:#aaaaaa" id="" onClick="character.pantsColor='aaaaaa';draw();" src="">
+			<button class="colorPick" style="background-color:#9a0000" id="" onClick="character.pantsColor='9a0000';draw();" src="" />
+			<button class="colorPick" style="background-color:#9a8900" id="" onClick="character.pantsColor='9a8900';draw();" src="" />
+			<button class="colorPick" style="background-color:#9abc02" id="" onClick="character.pantsColor='9abc02';draw();" src="" />
+			<button class="colorPick" style="background-color:#679d0d" id="" onClick="character.pantsColor='679d0d';draw();" src="" />
+			<button class="colorPick" style="background-color:#008097" id="" onClick="character.pantsColor='008097';draw();" src="" />
+			<button class="colorPick" style="background-color:#23399f" id="" onClick="character.pantsColor='23399f';draw();" src="" />
+			<button class="colorPick" style="background-color:#560b72" id="" onClick="character.pantsColor='560b72';draw();" src="" />
+			<button class="colorPick" style="background-color:#ab1672" id="" onClick="character.pantsColor='ab1672';draw();" src="" />
+			<button class="colorPick" style="background-color:#340909" id="" onClick="character.pantsColor='340909';draw();" src="" />
+			<button class="colorPick" style="background-color:#122806" id="" onClick="character.pantsColor='122806';draw();" src="" />
+			<button class="colorPick" style="background-color:#672f29" id="" onClick="character.pantsColor='672f29';draw();" src="" />
+			<button class="colorPick" style="background-color:#233355" id="" onClick="character.pantsColor='233355';draw();" src="" />
+			<button class="colorPick" style="background-color:#12052b" id="" onClick="character.pantsColor='12052b';draw();" src="" />
+			<button class="colorPick" style="background-color:#00003f" id="" onClick="character.pantsColor='00003f';draw();" src="" />
+			<button class="colorPick" style="background-color:#000000" id="" onClick="character.pantsColor='000000';draw();" src="" />
+			<button class="colorPick" style="background-color:#343f3f" id="" onClick="character.pantsColor='343f3f';draw();" src="" />
+			<button class="colorPick" style="background-color:#aaaaaa" id="" onClick="character.pantsColor='aaaaaa';draw();" src="" />
 		</span>
 	</div>
 	
@@ -677,11 +639,10 @@ function retirement(message) {
 
 
 
-
-</body>
-
 <script>
 	draw();
 	drawStatus();
 </script>
- 
+
+</body>
+</html>
