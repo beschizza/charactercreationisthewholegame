@@ -59,7 +59,7 @@ var character = {
 	toy:Math.floor(Math.random(1)*5),
 
 	// Utility functions
-	highestStat: function() { return STATNAMES.reduce(function(a, b){ return this[a] > this[b] ? a : b }); },
+	highestStat: function() { return STATNAMES.reduce(function(a, b){ return character[a] > character[b] ? a : b }); },
 	canIncreaseStat: function(stat) { return this.points > 0 },
 	canDecreaseStat: function(stat) { return this[stat] > 6 && this[stat] < 12 }
 }
