@@ -1,8 +1,9 @@
-#Character Creation is the Whole Game
+Character Creation is the Whole Game
+------------------------------------
 
 Anyone want to help me polish a 48-hour game development/prototype game that got a bit out of hand?
 
-https://beschizza.github.io/charactercreationisthewholegame/game.html
+https://beschizza.github.io/charactercreationisthewholegame
 
 Github: https://github.com/beschizza/charactercreationisthewholegame
 
